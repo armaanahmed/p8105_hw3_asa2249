@@ -21,22 +21,64 @@ load necessary packages for the script
   library(tidyr)
   library(dplyr)
   library(lubridate)
+  library(plotly)
 ```
 
 ```{r problem1}
 #load the dataset
-install.packages(p8105.datasets)
-library(p8105.datasets)
-instacart_data = data("instacart")
+#install.packages('p8105.datasets')
+#library(p8105.datasets)
+#instacart_data = data("instacart")
 
-head(data)
+
+# I had to use the csv dataset due to an error accessing P1805.datasets (incorrect version of R, I even tried upgrading/reinstalling)
+
+instacart_data = read_csv("./data/orders_train_allvars.csv",)
+head(instacart_data, 4)
+
+#names of variables
+names(instacart_data)
+#we have 15 variables, ranging from order_id to aisle
+
+summary(instacart_data)
+
+
+#How many aisles are there, and which aisles are the most items ordered from?
+unique(instacart_data['aisle'])
+
+frequency_table <- sort(table(instacart_data['aisle']))
+head(frequency_table)
+
+#Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.
+
+#get rid of aisles with less than 10000 items
+frequency_table <- frequency_table[frequency_table>10000]
+
+#make it a datafraem
+frequency_df = as.data.frame(frequency_table)
+frequency_df
+
+frequency_plot = ggplot(data = frequency_df, aes(x=Var1, y = Freq)) + geom_point() + ggtitle("Number of items ordered in each aisle") + xlab("aisle") + ylab("number of orders") + theme(axis.text.x = element_text(angle = 45, hjust=1)) + theme(plot.title = element_text(hjust = 0.5))
+
+plot(frequency_plot)
 
 
 ```
+The instacart dataset has 1,384,617 observations over 15 variables. Key variables include order_id, product_name, as well as aisle_id, which provide information on the order number, the type of product, and the aisle the product is located in. 
+
+
+
+
 The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and giving illstrative examples of observations. Then, do or answer the following (commenting on the results of each):
 
-How many aisles are there, and which aisles are the most items ordered from?
-Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.
+*How many aisles are there, and which aisles are the most items ordered from?*
+**There are 134 unique aisles, and the most orders come from (fresh vegetables (150609), fresh fruits (150473), and packaged vegetbale fruits (78493). That's weird because who wants fruits and vegetables.**
+
+
+*Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.*
+** I organized the plot with horizontal x-labels for readability, with ascending order counts as you move down the x-axis. You can see that aisles like butter, oil vinegars, and dry pasta, which are specifically labelled despite often being grouped (ie butter would be in dairy and juices, dry pasta would be with beans and other canned products), rank lower in the count of orders. On the other end, resfh vegetables and fresh fruits do really well, with orders of 150,000+**
+
+
 Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
 Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
 
